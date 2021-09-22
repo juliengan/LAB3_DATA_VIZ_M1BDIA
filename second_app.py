@@ -47,7 +47,10 @@ def load_bar():
 def log(func):
     def wrapper(*args,**kwargs):
         with open("logs.txt","a") as f:
-            f.write("Called function with " + " ".join([str(arg) for arg in args]) + " at " + str(datetime.datetime.now()) + "\n")
+            before = time.time()
+            func()
+            f.write("Called function with " + str(time.time() - before) + " seconds " + "\n")
+            #f.write("Called function with " + " ".join([str(arg) for arg in args]) + " at " + str(datetime.datetime.now()) + "\n")
         val = func(*args,**kwargs)
         return val
     return wrapper
@@ -56,23 +59,8 @@ def log(func):
 def run(a,b,c=9):
     print(a+b+c )
 
-
-#T I M E R
-@st.cache(suppress_st_warning=True)
-def timer(func):
-    def wrapper():
-        before = time.time()
-        func()
-        print("Function took:", time.time() - before, "seconds")
-    return wrapper
-
-@timer
-def run2():
-    time.sleep(2)
-
-
-
 #######################################  Data visualizations  ##############################################
+@log
 def point_cloud():
     pointcloud = st.expander("Point Cloud")
     df = pd.DataFrame(
@@ -84,11 +72,11 @@ def point_cloud():
     pointcloud.write(c)
     pointcloud.markdown('**Point cloud is still in construction...**')
 
-
+#@timer
 def dataset_print():
     expander = st.expander("Whole Dataset")
     expander.write(data)
-
+@log
 def heatmap():
     seaborn = st.expander("Heatmap")
 
@@ -99,7 +87,7 @@ def heatmap():
     plt.title('Heatmap')
     seaborn.pyplot(fig)
 
-
+@log
 def histogram_dom():
     histo = st.expander("Histogram - Day of the month")
     fig2, ax2 = plt.subplots()
@@ -110,7 +98,7 @@ def histogram_dom():
     plt.ylabel("Frequency")
     histo.pyplot(fig2)
 
-
+@log
 def histogram_hour():
     histo = st.expander("Histogram - Hour of the day")
     fig3, hours = plt.subplots()
@@ -121,6 +109,7 @@ def histogram_hour():
     plt.ylabel("Frequency")
     histo.pyplot(fig3)
 
+@log
 def histogram_weekdays():
     weekdays = st.expander("Histogram - Weekdays")
     fig4, weekdaysax = plt.subplots()
@@ -132,22 +121,21 @@ def histogram_weekdays():
     weekdays.pyplot(fig4)
 
 
-
+@log
 def map():
     mapexp = st.expander("Map")
-    map_data = pd.DataFrame(
-    np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],columns=['lat', 'lon'])
+    map_data = pd.DataFrame(np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],columns=['lat', 'lon'])
     mapexp.map(map_data)
     mapexp.write("The map is still in construction...")
 
-
+@log
 def dataframe_print():
     chart_data = pd.DataFrame(
     np.random.randn(20, 3),
     columns=['a', 'b', 'c'])
     #st.line_chart(chart_data)
 
-
+@log
 def twiny():
     twiny = st.expander("Twiny figure")
     ig,axes=plt.subplots()
@@ -157,7 +145,7 @@ def twiny():
     axes.set_xlabel("Lon",fontsize=12)
     axes.set_ylabel("Lat",fontsize=12)
 
-    twin_axes=axes.twiny()
+    #twin_axes=axes.twiny()
     twiny.pyplot(ig)
 
 ############################################################################################"
@@ -165,17 +153,14 @@ def twiny():
 
 
 
-run(1,3,c=9) 
-
-run2()
-
+#run(1,3,c=9) 
 #load_bar()
 
 
-st.title('Trips consultation')
+st.title('LAB3 - Julie NGAN')
 st.write('Here you can consult the trips and see information about the schedule and longitude/latitude from this list')
 
-_RELEASE = False
+''''_RELEASE = False
 
 if not _RELEASE:
     _component_func = components.declare_component(
@@ -202,7 +187,7 @@ if not _RELEASE:
     st.subheader("Component with variable args")
     name_input = st.text_input("Enter a name", value="Jeanne")
     num_clicks = my_component(name_input, key="foo")
-    st.markdown("You've clicked %s times!" % int(num_clicks))
+    st.markdown("You've clicked %s times!" % int(num_clicks))'''
 
 
 
@@ -213,7 +198,7 @@ dfdash = pd.DataFrame({
 
 
 #S I D E   B A R / M E N U
-title = st.sidebar.title('Menu')
+title = st.sidebar.title('Menu 🍔')
 st.sidebar.write(dfdash)
 option = st.sidebar.selectbox(
 'Choose the trips',
@@ -245,16 +230,17 @@ if option == "Uber Trips in January, 2014":
     #st.image(image, width=None)
     data=load_data("uber-raw-data-apr14.csv")
     
-    #D A T A   T R A N S F O R M A T I O N
-    data['Date/Time'] = pd.to_datetime(data['Date/Time'])
+#D A T A   T R A N S F O R M A T I O N
+#def data_transformation(data):
+data['Date/Time'] = pd.to_datetime(data['Date/Time'])
 
-    data['dom'] = data['Date/Time'].map(get_dom)
-    data['weekday'] = data['Date/Time'].map(get_weekday)
-    data['Hour'] = data['Date/Time'].map(get_hour)
+data['dom'] = data['Date/Time'].map(get_dom)
+data['weekday'] = data['Date/Time'].map(get_weekday)
+data['Hour'] = data['Date/Time'].map(get_hour)
 
-    #hours = plt.hist(data['Hour'], range = (0.5, 24), bins = 24)
+        #hours = plt.hist(data['Hour'], range = (0.5, 24), bins = 24)
     
-    
+
 
 if option == "NY Trips the 15th of January, 2015":
    # image = Image.open('NY trips.jpg')
@@ -297,7 +283,7 @@ components.html(
         <div class="card-header" id="headingOne">
           <h5 class="mb-0">
             <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-            Shakespeare
+            Shakespeare 📚
             </button>
           </h5>
         </div>
@@ -307,6 +293,7 @@ components.html(
           </div>
         </div>
       </div>
+
       <div class="card">
         <div class="card-header" id="headingTwo">
           <h5 class="mb-0">
@@ -317,13 +304,15 @@ components.html(
         </div>
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
           <div class="card-body">
-            Point Cloud
+            <iframe src="https://informationisbeautiful.net/visualizations/words-shakespeare-invented/" title="Shakespeare's invented words" ,width=1024,height=768)
           </div>
         </div>
       </div>
+
+
     </div>
     """,
-    height=600,
+    height=600
 )
 
 components.iframe("https://informationisbeautiful.net/visualizations/words-shakespeare-invented/", width=1024,height=768)
